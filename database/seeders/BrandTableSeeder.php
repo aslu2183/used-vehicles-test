@@ -20,6 +20,7 @@ class BrandTableSeeder extends Seeder
             ['name' => 'BENTLEY','category_id' => 2],
             ['name' => 'CHEVROLET','category_id' => 2],
             ['name' => 'DODGE','category_id' => 2],
+            ['name' => 'VOLVO','category_id' => 2],
         ];
 
         foreach($brands as $brand){
