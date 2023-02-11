@@ -17,3 +17,11 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::post("/create-vehicle",'VehicleController@createVehicle');
+Route::post("/create-category",'VehicleController@createCategory');
+Route::post("/create-brand",'VehicleController@createBrand');
+Route::post("/create-model",'VehicleController@createModel');
+Route::post("/create-variant",'VehicleController@createVariant');
+
+Route::get("/list-vehicles","VehicleController@getVehicles");

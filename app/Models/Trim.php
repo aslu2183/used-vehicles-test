@@ -9,4 +9,6 @@ class Trim extends Model
 {
     use HasFactory;
     protected $primaryKey = 'trim_id';
+
+    protected $fillable   = ['name','model_id'];
 }

@@ -22,7 +22,7 @@ class CreateVehiclesTable extends Migration
             $table->foreign('brand_id')->references('brand_id')->on('brands');
             $table->unsignedBigInteger('model_id')->comment("model");
             $table->foreign('model_id')->references('model_id')->on('models');
-            $table->unsignedBigInteger('trim_id')->comment("trim");
+            $table->unsignedBigInteger('trim_id')->comment("trim")->nullable();
             $table->foreign('trim_id')->references('trim_id')->on('trims');
             $table->longText('vehicle_image')->nullable();
             $table->timestamps();

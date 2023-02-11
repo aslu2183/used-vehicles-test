@@ -10,4 +10,6 @@ class VehicleModel extends Model
     use HasFactory;
     protected $primaryKey = 'model_id';
     protected $table      = 'models';
+
+    protected $fillable   = ['name','brand_id']; 
 }
