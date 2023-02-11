@@ -9,6 +9,7 @@ use App\Models\Vehicle;
 use App\Models\VehicleModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 
 class VehicleController extends Controller
 {
@@ -94,7 +95,7 @@ class VehicleController extends Controller
     public function getVehicles(Request $request){
         $limit= ($request->has('limit') && $request->limit > 0) ? $request->limit : 10;
         $page = $request->page ?? 1;
-        $vehicles = Vehicle::paginate($limit,['*'],'vehicles',$page);
+        $vehicles = Vehicle::with(['category:category_id,name','brand:brand_id,name','model:model_id,name','variant:trim_id,name'])->paginate($limit,['*'],'vehicles',$page);
         return [
             'status' => true,
             'message'=> 'Vehicle listing',
@@ -241,5 +242,73 @@ class VehicleController extends Controller
                 'message'=> 'Something went wrong'
             ];
         }
+    }
+
+    public function getCategories(){
+        $cats = Category::with('brand')->withCount('vehicle')->get();
+       
+        $tmp_arr = collect([]);
+        foreach($cats as $item){
+
+            if(!collect($item->brand)->isEmpty()){
+                $brand_arr = collect([]);
+                foreach($item->brand as $brand) {
+                    $models = VehicleModel::where('brand_id',$brand->brand_id)->get();
+                    $brand_vehicle_count = Vehicle::where('brand_id',$brand->brand_id)->count();
+                    $models_arr = collect([]);
+                    
+                    foreach($models as $model){
+                        $trims = Trim::where('model_id',$model->model_id)->get();
+                        $model_vehicle_count = Vehicle::where('model_id',$model->model_id)->count();
+                        
+                        $trims_arr = collect([]);
+                        foreach($trims as $trim){
+                            $model_vehicle_count = Vehicle::where('trim_id',$trim->trim_id)->count();
+                            $trims_arr->push([
+                                'name'    => $trim->name,
+                                'id'      => $trim->trim_id,
+                                'vehicle_count' => $model_vehicle_count
+                            ]);    
+                        }
+                        $models_arr->push([
+                            'name'    => $model->name,
+                            'id'      => $model->model_id,
+                            'variant' => $trims_arr,
+                            'vehicle_count' => $model_vehicle_count
+                        ]); 
+                    }
+                    
+                    $brand_arr->push([
+                        'name' => $brand->name,
+                        'id'   => $brand->brand_id,
+                        'model'=> $models_arr,
+                        'vehicle_count' => $brand_vehicle_count
+                    ]);
+                }
+                $tmp_arr->push([
+                    'name' => $item->name,
+                    'id'   => $item->category_id,
+                    'brand'=> $brand_arr,
+                    'vehicle_count' => $item->vehicle_count
+                ]);
+            }
+            else{
+               $tmp_arr->push([
+                    'name' => $item->name,
+                    'id'   => $item->id,
+                    'brand'=> [],
+                    'vehicle_count' => $item->vehicle_count
+                ]);
+            }
+            
+        }
+        return [
+            'status' => true,
+            'data'   => [
+                'categories' => $tmp_arr,
+                
+            ],
+            'message'=> "Listing Categories"
+        ];
     }
 }

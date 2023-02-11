@@ -12,4 +12,12 @@ class Category extends Model
     protected $primaryKey = 'category_id';
 
     protected $fillable = ['name'];
+
+    public function brand(){
+        return $this->hasMany(Brand::class,'category_id','category_id');
+    }
+
+    public function vehicle(){
+        return $this->hasMany(Vehicle::class,'category_id','category_id');
+    }
 }

@@ -14,4 +14,14 @@ class Brand extends Model
         'name',
         'category_id'
     ];
+
+    protected $hidden = ['category_id'];
+    
+    public function model(){
+        return $this->hasMany(VehicleModel::class,'brand_id','brand_id');
+    }
+
+    public function vehicle(){
+        return $this->hasMany(Vehicle::class,'brand_id','brand_id');
+    }
 }
