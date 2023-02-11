@@ -17,8 +17,6 @@ class VehicleController extends Controller
         $request->validate([
             'name'     => 'required',
             'category' => 'required',
-            'brand'    => 'required',
-            'model'    => 'required',
         ]);
 
         $category = Category::where('name',$request->category)->first(); 
@@ -28,20 +26,31 @@ class VehicleController extends Controller
                 'message'=> "Category not found"
             ];
         }
-        $brand    = Brand::where('name',$request->brand)->first();
-        if(!$brand){
-            return [
-                'status' => false,
-                'message'=> "Brand not found"
-            ];
+
+        $brand_id = null;
+        if($request->has('brand')){
+            $brand    = Brand::where('name',$request->brand)->first();
+            if(!$brand){
+                return [
+                    'status' => false,
+                    'message'=> "Brand not found"
+                ];
+            }
+            $brand_id = $brand->brand_id;
         }
-        $model    = VehicleModel::where('name',$request->model)->first();
-        if(!$model){
-            return [
-                'status' => false,
-                'message'=> "Model Not Found"
-            ];
+
+        $model_id = null;
+        if($request->has('model')){
+            $model = VehicleModel::where('name',$request->model)->first();
+            if(!$model){
+                return [
+                    'status' => false,
+                    'message'=> "Model Not Found"
+                ];
+            }
+            $model_id = $model->model_id;
         }
+
         $trim_id     = null;
         if($request->has('trim')){
             $trim    = Trim::where('name',$request->trim)->first();
@@ -58,8 +67,8 @@ class VehicleController extends Controller
         $insertData = [
             'name'          => $request->name,
             'category_id'   => $category->category_id,
-            'brand_id'      => $brand->brand_id,
-            'model_id'      => $model->model_id,
+            'brand_id'      => $brand_id,
+            'model_id'      => $model_id,
             'trim_id'       => $trim_id,
             'vehicle_image' => $file
         ];

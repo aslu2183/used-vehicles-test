@@ -18,9 +18,9 @@ class CreateVehiclesTable extends Migration
             $table->string('name');
             $table->unsignedBigInteger('category_id')->comment("cateogry");
             $table->foreign('category_id')->references('category_id')->on('categories');
-            $table->unsignedBigInteger('brand_id')->comment("brand");
+            $table->unsignedBigInteger('brand_id')->comment("brand")->nullable();
             $table->foreign('brand_id')->references('brand_id')->on('brands');
-            $table->unsignedBigInteger('model_id')->comment("model");
+            $table->unsignedBigInteger('model_id')->comment("model")->nullable();
             $table->foreign('model_id')->references('model_id')->on('models');
             $table->unsignedBigInteger('trim_id')->comment("trim")->nullable();
             $table->foreign('trim_id')->references('trim_id')->on('trims');

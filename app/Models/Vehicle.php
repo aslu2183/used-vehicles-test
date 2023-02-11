@@ -53,7 +53,7 @@ class Vehicle extends Model
         return $this->hasOne(VehicleModel::class,'model_id','model_id');
     }
 
-    public function trim(){
+    public function variant(){
         return $this->hasOne(Trim::class,'trim_id','trim_id');
     }
 
