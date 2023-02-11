@@ -26,7 +26,7 @@ class Vehicle extends Model
         'category:category_id,name',
         'brand:brand_id,name',
         'model:model_id,name',
-        'trim:trim_id,name'
+        'variant:trim_id,name'
     ];
 
     protected $hidden = [
