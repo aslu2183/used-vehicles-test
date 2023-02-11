@@ -8,6 +8,7 @@ use App\Models\Trim;
 use App\Models\Vehicle;
 use App\Models\VehicleModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class VehicleController extends Controller
 {
@@ -50,7 +51,7 @@ class VehicleController extends Controller
         $file = null;
         if($request->has('image')){
             $extension = $request->file('image')->getClientOriginalExtension();
-            $file_name = $request->name."_".time().".".$extension;
+            $file_name = Str::slug($request->name, '-')."_".time().".".$extension;
             $file      = $request->file('image')->storeAs('vehicles',$file_name);
         }
 
