@@ -99,7 +99,7 @@ class VehicleController extends Controller
         $vehicleData = [];
         $finalData = [];
         if(count($request->filter) > 0){
-            $test = "HAs filter";
+            
             foreach($filters as $filter){
                 $filter_arr = [];
                 $j = 0;
@@ -332,11 +332,11 @@ class VehicleController extends Controller
                         
                         $trims_arr = collect([]);
                         foreach($trims as $trim){
-                            $model_vehicle_count = Vehicle::where('trim_id',$trim->trim_id)->count();
+                            $trim_vehicle_count = Vehicle::where('trim_id',$trim->trim_id)->count();
                             $trims_arr->push([
                                 'name'    => $trim->name,
                                 'id'      => $trim->trim_id,
-                                'vehicle_count' => $model_vehicle_count
+                                'vehicle_count' => $trim_vehicle_count
                             ]);    
                         }
                         $models_arr->push([
