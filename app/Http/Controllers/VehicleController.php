@@ -98,7 +98,7 @@ class VehicleController extends Controller
         // $i = 0;
         $vehicleData = [];
         $finalData = [];
-        if(count($request->filter) > 0){
+        if($request->has('filter') && count($request->filter) > 0){
             
             foreach($filters as $filter){
                 $filter_arr = [];
