@@ -53,8 +53,8 @@ class VehicleController extends Controller
         }
 
         $trim_id     = null;
-        if($request->has('trim')){
-            $trim    = Trim::where('name',$request->trim)->first();
+        if($request->has('variant')){
+            $trim    = Trim::where('name',$request->variant)->first();
             $trim_id = $trim->trim_id;
         }    
 
@@ -79,7 +79,6 @@ class VehicleController extends Controller
             return [
                 'status' => true,
                 'message'=> 'Vehicle Created',
-                'data'   => $insertData
             ];
         }
         else{
