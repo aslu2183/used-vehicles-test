@@ -94,64 +94,84 @@ class VehicleController extends Controller
 
     public function getVehicles(Request $request){
         $levels  = collect([0 => 'category',1 => 'brand',2 => 'model', 3 => 'variant']);
-        $limit   = ($request->has('limit') && $request->limit > 0) ? $request->limit : 10;
+        // $limit   = ($request->has('limit') && $request->limit > 0) ? $request->limit : 10;
         $filters = $request->filter;
-        $i = 0;
-        $filter_arr = [];
-        foreach($filters as $filter){
-            $names = $filter;
-            $value = [];
-            if($levels[$i] == 'category'){
-                $cats  = Category::whereIn('name',$names)->get();
-                $value = $cats->map(function($cat){
-                    return $cat->category_id;
-                }); 
+        // $i = 0;
+        $vehicleData = [];
+        $finalData = [];
+        if(count($request->filter) > 0){
+            $test = "HAs filter";
+            foreach($filters as $filter){
+                $filter_arr = [];
+                $j = 0;
+                foreach($filter as $res){
+                    $value = 0;
+                    if($levels[$j] == 'category'){
+                        $cats  = Category::where('name',$res)->first();
+                        if($cats){
+                            $value = $cats->category_id;
+                        }    
+                        
+                    }
+                    if($levels[$j] == 'brand'){
+                        $cats  = Brand::where('name',$res)->first();
+                        if($cats){
+                            $value = $cats->brand_id;
+                        }    
+                    }
+                    if($levels[$j] == 'model'){
+                        $cats  = VehicleModel::where('name',$res)->first();
+                        if($cats){
+                            $value = $cats->model_id;
+                        }    
+                    }
+                    if($levels[$j] == 'variant'){
+                        $cats  = Trim::where('name',$res)->first();
+                        if($cats){
+                            $value = $cats->trim_id;
+                        }    
+                    }
+                    
+                    if($value > 0){
+                        $filter_arr[$levels[$j]] = $value;
+                    }    
+                    $j++;
+                }
+                $filter_collect = collect($filter_arr);
+                $vehicles       = Vehicle::with(['category:category_id,name','brand:brand_id,name','model:model_id,name','variant:trim_id,name']);
+                if($filter_collect->has('category')){
+                    $vehicles = $vehicles->where('category_id',$filter_collect->get('category'));
+                }
+                if($filter_collect->has('brand')){
+                    $vehicles = $vehicles->where('brand_id',$filter_collect->get('brand'));
+                }
+                if($filter_collect->has('model')){
+                    $vehicles = $vehicles->where('model_id',$filter_collect->get('model'));
+                }
+                if($filter_collect->has('variant')){
+                    $vehicles = $vehicles->where('trim_id',$filter_collect->get('variant'));
+                }
+                $vehicleData[] = $vehicles->get();
+                
             }
-            if($levels[$i] == 'brand'){
-                $cats  = Brand::whereIn('name',$names)->get();
-                $value = $cats->map(function($cat){
-                    return $cat->brand_id;
-                }); 
+            
+            foreach($vehicleData as $vehicles){
+                foreach($vehicles as $vehicle){
+                    array_push($finalData,$vehicle);
+                }
             }
-            if($levels[$i] == 'model'){
-                $cats  = VehicleModel::whereIn('name',$names)->get();
-                $value = $cats->map(function($cat){
-                    return $cat->model_id;
-                }); 
-            }
-            if($levels[$i] == 'variant'){
-                $cats  = Trim::whereIn('name',$names)->get();
-                $value = $cats->map(function($cat){
-                    return $cat->trim_id;
-                }); 
-            }
-            $filter_arr[$levels[$i]] = $value;
-            $i++;
         }
-        $filter_collect = collect($filter_arr);
-        $page = $request->pageno ?? 1;
-        $vehicles = Vehicle::with(['category:category_id,name','brand:brand_id,name','model:model_id,name','variant:trim_id,name']);
-        if($filter_collect->has('category')){
-            $vehicles = $vehicles->whereIn('category_id',$filter_collect->get('category'));
-        }
-        if($filter_collect->has('brand')){
-            $vehicles = $vehicles->whereIn('brand_id',$filter_collect->get('brand'));
-        }
-        if($filter_collect->has('model')){
-            $vehicles = $vehicles->whereIn('model_id',$filter_collect->get('model'));
-        }
-        if($filter_collect->has('variant')){
-            $vehicles = $vehicles->whereIn('trim_id',$filter_collect->get('variant'));
-        }
-        // $sql      = $vehicles->toSql();
-        $vehicles = $vehicles->paginate($limit,['*'],'vehicles',$page);
-         
+        else{
+            $vehicles = Vehicle::with(['category:category_id,name','brand:brand_id,name','model:model_id,name','variant:trim_id,name'])->get();
+            $finalData = $vehicles;
+        }    
+                         
         return [
             'status' => true,
             'message'=> 'Vehicle listing',
             'data'   => [
-                'vehicles' => $vehicles->toArray()['data'],
-                'total'    => $vehicles->total(),
+                'vehicles' => $finalData,
+               
             ] 
         ];
     }
