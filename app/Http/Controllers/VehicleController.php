@@ -99,7 +99,7 @@ class VehicleController extends Controller
         $i = 0;
         $filter_arr = [];
         foreach($filters as $filter){
-            $names = json_decode($filter);
+            $names = $filter;
             $value = [];
             if($levels[$i] == 'category'){
                 $cats  = Category::whereIn('name',$names)->get();
