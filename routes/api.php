@@ -24,5 +24,5 @@ Route::post("/create-brand",'VehicleController@createBrand');
 Route::post("/create-model",'VehicleController@createModel');
 Route::post("/create-variant",'VehicleController@createVariant');
 
-Route::get("/list-vehicles","VehicleController@getVehicles");
+Route::post("/list-vehicles","VehicleController@getVehicles");
 Route::get("/list-categories","VehicleController@getCategories");

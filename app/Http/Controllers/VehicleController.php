@@ -93,15 +93,65 @@ class VehicleController extends Controller
     }
 
     public function getVehicles(Request $request){
-        $limit= ($request->has('limit') && $request->limit > 0) ? $request->limit : 10;
-        $page = $request->page ?? 1;
-        $vehicles = Vehicle::with(['category:category_id,name','brand:brand_id,name','model:model_id,name','variant:trim_id,name'])->paginate($limit,['*'],'vehicles',$page);
+        $levels  = collect([0 => 'category',1 => 'brand',2 => 'model', 3 => 'variant']);
+        $limit   = ($request->has('limit') && $request->limit > 0) ? $request->limit : 10;
+        $filters = $request->filter;
+        $i = 0;
+        $filter_arr = [];
+        foreach($filters as $filter){
+            $names = json_decode($filter);
+            $value = [];
+            if($levels[$i] == 'category'){
+                $cats  = Category::whereIn('name',$names)->get();
+                $value = $cats->map(function($cat){
+                    return $cat->category_id;
+                }); 
+            }
+            if($levels[$i] == 'brand'){
+                $cats  = Brand::whereIn('name',$names)->get();
+                $value = $cats->map(function($cat){
+                    return $cat->brand_id;
+                }); 
+            }
+            if($levels[$i] == 'model'){
+                $cats  = VehicleModel::whereIn('name',$names)->get();
+                $value = $cats->map(function($cat){
+                    return $cat->model_id;
+                }); 
+            }
+            if($levels[$i] == 'variant'){
+                $cats  = Trim::whereIn('name',$names)->get();
+                $value = $cats->map(function($cat){
+                    return $cat->trim_id;
+                }); 
+            }
+            $filter_arr[$levels[$i]] = $value;
+            $i++;
+        }
+        $filter_collect = collect($filter_arr);
+        $page = $request->pageno ?? 1;
+        $vehicles = Vehicle::with(['category:category_id,name','brand:brand_id,name','model:model_id,name','variant:trim_id,name']);
+        if($filter_collect->has('category')){
+            $vehicles = $vehicles->whereIn('category_id',$filter_collect->get('category'));
+        }
+        if($filter_collect->has('brand')){
+            $vehicles = $vehicles->whereIn('brand_id',$filter_collect->get('brand'));
+        }
+        if($filter_collect->has('model')){
+            $vehicles = $vehicles->whereIn('model_id',$filter_collect->get('model'));
+        }
+        if($filter_collect->has('variant')){
+            $vehicles = $vehicles->whereIn('trim_id',$filter_collect->get('variant'));
+        }
+        // $sql      = $vehicles->toSql();
+        $vehicles = $vehicles->paginate($limit,['*'],'vehicles',$page);
+         
         return [
             'status' => true,
             'message'=> 'Vehicle listing',
             'data'   => [
                 'vehicles' => $vehicles->toArray()['data'],
-                'total'    => $vehicles->total()
+                'total'    => $vehicles->total(),
             ] 
         ];
     }
